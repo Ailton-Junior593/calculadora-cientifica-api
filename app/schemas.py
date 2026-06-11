@@ -1,6 +1,5 @@
 from enum import Enum
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, model_validator
 
 
 class Operacao(str, Enum):
@@ -8,41 +7,59 @@ class Operacao(str, Enum):
     SUBTRACAO = "-"
     MULTIPLICACAO = "*"
     DIVISAO = "/"
-
     POTENCIA = "^"
-    Y_ELEVADO_X = "yx"
+    YX = "yx"
 
-    RAIZ_QUADRADA = "sqrt"
-    EXPONENCIAL = "exp"
+    SQRT = "sqrt"
+    EXP = "exp"
 
-    SENO = "sin"
-    SENO_INVERSO = "asin"
+    SIN = "sin"
+    COS = "cos"
+    TAN = "tan"
 
-    COSSENO = "cos"
-    COSSENO_INVERSO = "acos"
+    ASIN = "asin"
+    ACOS = "acos"
+    ATAN = "atan"
 
-    TANGENTE = "tan"
-    TANGENTE_INVERSA = "atan"
+    LN = "ln"
+    LOG = "log"
 
-    LOG_NATURAL = "ln"
-    LOG_BASE10 = "log"
-
-    NEGATIVO = "neg"
-
+    NEG = "neg"
     PI = "pi"
 
-    SENO_GRAUS = "sin_graus"
-    COSSENO_GRAUS = "cos_graus"
-    TANGENTE_GRAUS = "tan_graus"
+    SIN_GRAUS = "sin_graus"
+    COS_GRAUS = "cos_graus"
+    TAN_GRAUS = "tan_graus"
 
 
 class Calculo(BaseModel):
     operacao: Operacao
-    n1: Optional[float] = None
-    n2: Optional[float] = None
+    n1: float | None = None
+    n2: float | None = None
+
+    @model_validator(mode="after")
+    def validar(self):
+        unarias = {
+            "sqrt", "exp", "sin", "cos", "tan",
+            "asin", "acos", "atan",
+            "ln", "log",
+            "neg", "pi",
+            "sin_graus", "cos_graus", "tan_graus"
+        }
+
+        op = self.operacao.value
+
+        if op in unarias:
+            if self.n1 is None:
+                raise ValueError(f"Operação '{op}' requer n1")
+        else:
+            if self.n1 is None or self.n2 is None:
+                raise ValueError(f"Operação '{op}' requer n1 e n2")
+
+        return self
 
 
 class ResultadoResponse(BaseModel):
     success: bool
     operacao: str
-    resultado: float | str
+    resultado: float

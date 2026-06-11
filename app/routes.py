@@ -1,25 +1,17 @@
 from fastapi import APIRouter, HTTPException
-
 from app.schemas import Calculo, ResultadoResponse
 from app.services import executar_operacao
 
-router = APIRouter(
-    prefix="/api",
-    tags=["Calculadora"]
-)
+router = APIRouter(prefix="/api")
 
-@router.post(
-    "/calcular",
-    response_model=ResultadoResponse
-)
+@router.post("/calcular", response_model=ResultadoResponse)
 def calcular(dados: Calculo):
 
     try:
-
         resultado = executar_operacao(
-            operacao=dados.operacao.value,
-            n1=dados.n1,
-            n2=dados.n2
+            dados.operacao.value,
+            dados.n1,
+            dados.n2
         )
 
         return ResultadoResponse(
@@ -28,9 +20,9 @@ def calcular(dados: Calculo):
             resultado=resultado
         )
 
-    except ValueError as erro:
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-        raise HTTPException(
-            status_code=400,
-            detail=str(erro)
-        )
+    except Exception:
+        
+        raise HTTPException(status_code=500, detail="Erro interno")

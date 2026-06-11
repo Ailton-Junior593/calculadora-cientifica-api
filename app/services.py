@@ -1,26 +1,4 @@
-from app.function import (
-    soma,
-    subtracao,
-    multiplicacao,
-    divisao,
-    potencia,
-    y_elevadox,
-    raiz_quadrada,
-    exponencial,
-    seno,
-    seno_inverso,
-    cosseno,
-    cosseno_inverso,
-    tangente,
-    tangente_inversa,
-    log_natural,
-    log_base10,
-    negativo,
-    pi,
-    seno_graus,
-    cosseno_graus,
-    tangente_graus
-)
+from app.function import *
 
 OPERACOES = {
     "+": lambda n1, n2: soma(n1, n2),
@@ -35,12 +13,11 @@ OPERACOES = {
     "exp": lambda n1, _: exponencial(n1),
 
     "sin": lambda n1, _: seno(n1),
-    "asin": lambda n1, _: seno_inverso(n1),
-
     "cos": lambda n1, _: cosseno(n1),
-    "acos": lambda n1, _: cosseno_inverso(n1),
-
     "tan": lambda n1, _: tangente(n1),
+
+    "asin": lambda n1, _: seno_inverso(n1),
+    "acos": lambda n1, _: cosseno_inverso(n1),
     "atan": lambda n1, _: tangente_inversa(n1),
 
     "ln": lambda n1, _: log_natural(n1),
@@ -52,23 +29,24 @@ OPERACOES = {
     "cos_graus": lambda n1, _: cosseno_graus(n1),
     "tan_graus": lambda n1, _: tangente_graus(n1),
 
-    "pi": lambda _, __: pi(),
+    "pi": lambda *_: pi(),
 }
 
 
-def executar_operacao(
-    operacao: str,
-    n1: float | None = None,
-    n2: float | None = None
-):
-    """
-    Executa uma operação matemática baseada
-    na chave informada.
-    """
-
+def executar_operacao(operacao: str, n1=None, n2=None):
     if operacao not in OPERACOES:
-        raise ValueError(
-            f"Operação '{operacao}' não suportada."
-        )
+        raise ValueError("Operação inválida")
 
-    return OPERACOES[operacao](n1, n2)
+    try:
+        resultado = OPERACOES[operacao](n1, n2)
+
+        if resultado is None:
+            raise ValueError("Resultado inválido")
+
+        return resultado
+
+    except ZeroDivisionError:
+        raise ValueError("Divisão por zero não permitida")
+
+    except TypeError:
+        raise ValueError("Parâmetros inválidos para operação")
