@@ -34,16 +34,25 @@ OPERACOES = {
 
 
 def executar_operacao(operacao: str, n1=None, n2=None):
+
     if operacao not in OPERACOES:
         raise ValueError("Operação inválida")
 
     try:
         resultado = OPERACOES[operacao](n1, n2)
 
+        # 🔥 FORÇA RESULTADO SER PRIMITIVO
+        if isinstance(resultado, dict):
+            resultado = (
+                resultado.get("resultado")
+                or resultado.get("value")
+                or list(resultado.values())[0]
+            )
+
         if resultado is None:
             raise ValueError("Resultado inválido")
 
-        return resultado
+        return float(resultado)
 
     except ZeroDivisionError:
         raise ValueError("Divisão por zero não permitida")
